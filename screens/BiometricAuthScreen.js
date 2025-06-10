@@ -1,67 +1,33 @@
-// screens/BiometricAuthScreen.js
-import React, { useEffect, useState } from "react";
-import {
-  View,
-  Text,
-  Button,
-  StyleSheet,
-  Alert,
-  ActivityIndicator,
-} from "react-native";
+import React, { useEffect } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import * as LocalAuthentication from "expo-local-authentication";
-import { useAuthStore } from "../store/useAuthStore";
 
 export default function BiometricAuthScreen({ navigation }) {
-  const [loading, setLoading] = useState(true);
-  const { isLoggedIn } = useAuthStore();
-
   useEffect(() => {
-    checkBiometry();
-  }, []);
-
-  const checkBiometry = async () => {
-    const hasHardware = await LocalAuthentication.hasHardwareAsync();
-    const supportedTypes =
-      await LocalAuthentication.supportedAuthenticationTypesAsync();
-    const enrolled = await LocalAuthentication.isEnrolledAsync();
-
-    if (!hasHardware || !enrolled || supportedTypes.length === 0) {
-      Alert.alert("Erro", "Biometria não disponível neste dispositivo.");
+    (async () => {
+      const supported = await LocalAuthentication.hasHardwareAsync();
+      const enrolled = await LocalAuthentication.isEnrolledAsync();
+      if (supported && enrolled) {
+        // Tenta biometria e, se falhar, apresenta fallback para senha/PIN do dispositivo
+        await LocalAuthentication.authenticateAsync({
+          promptMessage: "Autentique-se para continuar",
+          fallbackLabel: "Use a senha do dispositivo",
+          disableDeviceFallback: false,
+        });
+      }
+      // Após tentativa de autenticação, segue para Login
       navigation.replace("Login");
-      return;
-    }
+    })();
+  }, [navigation]);
 
-    const result = await LocalAuthentication.authenticateAsync({
-      promptMessage: "Autentique-se para continuar",
-      fallbackLabel: "Use o PIN",
-    });
-
-    if (result.success) {
-      navigation.replace("Home"); // ou tela principal
-    } else {
-      Alert.alert(
-        "Falha na autenticação",
-        "Você pode tentar novamente ou usar o login tradicional."
-      );
-      navigation.replace("Login");
-      navigation.replace("LoginPIN");
-    }
-
-    setLoading(false);
-  };
-
-  if (loading) {
-    return (
-      <View style={styles.center}>
-        <ActivityIndicator size="large" />
-        <Text>Verificando biometria...</Text>
-      </View>
-    );
-  }
-
-  return null;
+  return (
+    <View style={styles.container}>
+      <Text style={styles.title}>Autenticação Biométrica</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+  container: { flex: 1, justifyContent: "center", alignItems: "center" },
+  title: { fontSize: 18 }
 });

@@ -1,12 +1,19 @@
-// screens/AdicionarContaScreen.js
 import React, { useEffect, useState } from 'react';
 import {
-  View, Text, TextInput, Button,
-  StyleSheet, ScrollView, Alert
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  Alert,
+  ImageBackground,
+  SafeAreaView,
+  TouchableOpacity,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { useAuthStore } from '../store/useAuthStore';
 import axios from '../services/api';
+import { globalStyles } from '../styles/globalStyles';
 
 export default function AdicionarContaScreen() {
   const navigation = useNavigation();
@@ -48,48 +55,76 @@ export default function AdicionarContaScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Nova Conta Bancária</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do Banco"
-        value={banco}
-        onChangeText={setBanco}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Agência"
-        keyboardType="numeric"
-        value={agencia}
-        onChangeText={setAgencia}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Número da Conta"
-        keyboardType="numeric"
-        value={numero_conta}
-        onChangeText={setNumeroConta}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Chave Pix (opcional)"
-        value={chave_pix}
-        onChangeText={setChavePix}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Saldo Inicial (R$)"
-        keyboardType="numeric"
-        value={saldo_inicial}
-        onChangeText={setSaldoInicial}
-      />
-      <Button title="Salvar Conta" onPress={handleSalvarConta} />
-    </ScrollView>
+    <ImageBackground
+      source={require('../assets/images/image.png')}
+      style={globalStyles.background}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={globalStyles.safeArea}>
+        <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Nova Conta Bancária</Text>
+
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Nome do Banco"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={banco}
+              onChangeText={setBanco}
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Agência"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              keyboardType="numeric"
+              value={agencia}
+              onChangeText={setAgencia}
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Número da Conta"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              keyboardType="numeric"
+              value={numero_conta}
+              onChangeText={setNumeroConta}
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Chave Pix (opcional)"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={chave_pix}
+              onChangeText={setChavePix}
+            />
+            <TextInput
+              style={globalStyles.input}
+              placeholder="Saldo Inicial (R$)"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              keyboardType="numeric"
+              value={saldo_inicial}
+              onChangeText={setSaldoInicial}
+            />
+
+            <TouchableOpacity style={globalStyles.formButton} onPress={handleSalvarConta}>
+              <Text style={globalStyles.formButtonText}>Salvar Conta</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flexGrow:1, justifyContent:'center', padding:20, backgroundColor:'#11111A' },
-  title: { fontSize:22, color:'#00BFFF', marginBottom:20, textAlign:'center' },
-  input: { backgroundColor:'#FFF', borderRadius:8, padding:10, marginBottom:15 },
+  container: {
+    backgroundColor: 'rgba(17, 17, 26, 0.66)',
+    padding: 20,
+    borderRadius: 12,
+  },
+  title: {
+    fontSize: 22,
+    color: '#FFFFFF',
+    marginBottom: 20,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
 });

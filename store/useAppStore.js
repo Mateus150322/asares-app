@@ -1,6 +1,7 @@
 // store/useAppStore.js
 import { create } from 'zustand';
 import axios from 'axios';
+import api from '../services/api'; // Ajuste o caminho conforme necessário
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const useAppStore = create((set, get) => ({
@@ -9,13 +10,8 @@ export const useAppStore = create((set, get) => ({
 
   adicionarConta: async (novaConta) => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await axios.post('http://127.0.0.1:8000/api/contas', novaConta, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      set((state) => ({ contas: [...state.contas, response.data] }));
+      const { data } = await api.post('/contas', novaConta);
+      set(state => ({ contas: [...state.contas, data] }));
       return { sucesso: true };
     } catch (error) {
       console.error('Erro ao adicionar conta:', error);
@@ -23,15 +19,12 @@ export const useAppStore = create((set, get) => ({
     }
   },
 
-  adicionarTransacao: async (novaTransacao) => {
+  adicionarTransacao: async (novaTransacao, tipo) => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await axios.post('http://127.0.0.1:8000/api/transacoes', novaTransacao, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      set((state) => ({ transacoes: [...state.transacoes, response.data] }));
+      // escolhe endpoint de entrada ou saída
+      const path = tipo === 'saida' ? '/transacoes/saida' : '/transacoes/entrada';
+      const { data } = await api.post(path, novaTransacao);
+      set(state => ({ transacoes: [...state.transacoes, data.transacao] }));
       return { sucesso: true };
     } catch (error) {
       console.error('Erro ao adicionar transação:', error);
@@ -41,13 +34,8 @@ export const useAppStore = create((set, get) => ({
 
   buscarTransacoes: async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const response = await axios.get('http://127.0.0.1:8000/api/transacoes', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      set({ transacoes: response.data });
+      const { data } = await api.get('/transacoes');
+      set({ transacoes: data });
     } catch (error) {
       console.error('Erro ao buscar transações:', error);
     }

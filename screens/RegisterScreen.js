@@ -1,6 +1,16 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from "react-native";
-import axios from "../services/api"; // usando sua instância já configurada
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  ScrollView,
+  TouchableOpacity,
+  ImageBackground,
+  SafeAreaView,
+} from "react-native";
+import axios from "../services/api";
+import { globalStyles } from "../styles/globalStyles";
 
 export default function RegisterScreen({ navigation }) {
   const [name, setName] = useState("");
@@ -10,8 +20,7 @@ export default function RegisterScreen({ navigation }) {
 
   const handleRegister = async () => {
     try {
-      setErrors({}); // limpa erros anteriores
-
+      setErrors({});
       const response = await axios.post("/register", {
         name,
         email,
@@ -19,12 +28,10 @@ export default function RegisterScreen({ navigation }) {
         password_confirmation: password,
       });
 
-      console.log("Registrado com sucesso:", response.data);
       alert("Cadastro realizado com sucesso!");
       navigation.navigate("Login");
     } catch (error) {
       if (error.response && error.response.status === 422) {
-        console.log("Erro de validação:", error.response.data.errors);
         setErrors(error.response.data.errors || {});
       } else {
         alert("Erro de conexão com o servidor.");
@@ -33,61 +40,72 @@ export default function RegisterScreen({ navigation }) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Criar Conta</Text>
+    <ImageBackground
+      source={require("../assets/images/image.png")}
+      style={globalStyles.background}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={globalStyles.safeArea}>
+        <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
+          <View style={styles.container}>
+            <Text style={styles.title}>Criar Conta</Text>
 
-      {errors.name && <Text style={styles.error}>{errors.name[0]}</Text>}
-      <TextInput
-        placeholder="Nome"
-        value={name}
-        onChangeText={setName}
-        style={styles.input}
-      />
+            {errors.name && <Text style={styles.error}>{errors.name[0]}</Text>}
+            <TextInput
+              placeholder="Nome"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={name}
+              onChangeText={setName}
+              style={globalStyles.input}
+            />
 
-      {errors.email && <Text style={styles.error}>{errors.email[0]}</Text>}
-      <TextInput
-        placeholder="Email"
-        value={email}
-        onChangeText={setEmail}
-        keyboardType="email-address"
-        autoCapitalize="none"
-        style={styles.input}
-      />
+            {errors.email && <Text style={styles.error}>{errors.email[0]}</Text>}
+            <TextInput
+              placeholder="Email"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={globalStyles.input}
+            />
 
-      {errors.password && <Text style={styles.error}>{errors.password[0]}</Text>}
-      <TextInput
-        placeholder="Senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        style={styles.input}
-      />
+            {errors.password && <Text style={styles.error}>{errors.password[0]}</Text>}
+            <TextInput
+              placeholder="Senha"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              style={globalStyles.input}
+            />
 
-      <Button title="Registrar" onPress={handleRegister} />
+            <TouchableOpacity style={globalStyles.formButton} onPress={handleRegister}>
+              <Text style={globalStyles.formButtonText}>Registrar</Text>
+            </TouchableOpacity>
 
-      <Text style={styles.link} onPress={() => navigation.navigate("Login")}>
-        Já tem conta? Entrar
-      </Text>
-    </ScrollView>
+            <Text style={styles.link} onPress={() => navigation.navigate("Login")}>
+              Já tem conta? Entrar
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    justifyContent: "center",
+    backgroundColor: "rgba(17, 17, 26, 0.66)",
     padding: 20,
+    borderRadius: 12,
   },
   title: {
     fontSize: 24,
     marginBottom: 20,
     textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    marginBottom: 12,
-    padding: 10,
-    borderRadius: 8,
+    color: "#FFF",
+    fontWeight: "600",
   },
   error: {
     color: "red",
@@ -98,6 +116,7 @@ const styles = StyleSheet.create({
   link: {
     marginTop: 15,
     textAlign: "center",
-    color: "blue",
+    color: "#00BFFF",
+    fontSize: 16,
   },
 });

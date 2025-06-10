@@ -1,6 +1,17 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  StyleSheet,
+  Alert,
+  ImageBackground,
+  SafeAreaView,
+  ScrollView,
+  TouchableOpacity,
+} from 'react-native';
 import { useAppStore } from '../store/useAppStore';
+import { globalStyles } from '../styles/globalStyles';
 
 export default function CadastrarContaScreen({ navigation }) {
   const [banco, setBanco] = useState('');
@@ -18,31 +29,45 @@ export default function CadastrarContaScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.label}>Banco</Text>
-      <TextInput value={banco} onChangeText={setBanco} style={styles.input} />
+    <ImageBackground
+      source={require('../assets/images/image.png')}
+      style={globalStyles.background}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={globalStyles.safeArea}>
+        <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
+          <View style={styles.container}>
+            <TextInput
+              value={banco}
+              onChangeText={setBanco}
+              style={globalStyles.input}
+              placeholder="Nome do Banco"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+            />
 
-      <Text style={styles.label}>Saldo Inicial</Text>
-      <TextInput
-        value={saldoInicial}
-        onChangeText={setSaldoInicial}
-        style={styles.input}
-        keyboardType="numeric"
-      />
+            <TextInput
+              value={saldoInicial}
+              onChangeText={setSaldoInicial}
+              style={globalStyles.input}
+              placeholder="Saldo Inicial (R$)"
+              placeholderTextColor="rgba(255,255,255,0.4)"
+              keyboardType="numeric"
+            />
 
-      <Button title="Salvar Conta" onPress={handleSalvar} />
-    </View>
+            <TouchableOpacity style={globalStyles.formButton} onPress={handleSalvar}>
+              <Text style={globalStyles.formButtonText}>Salvar Conta</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  label: { fontWeight: 'bold', marginTop: 20 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    padding: 10,
-    borderRadius: 8,
-    marginTop: 5,
+  container: {
+    backgroundColor: 'rgba(17, 17, 26, 0.66)',
+    padding: 20,
+    borderRadius: 12,
   },
 });

@@ -1,10 +1,22 @@
-// screens/HomeScreen.js
-import React, { useState, useCallback, useEffect } from 'react';
-import { useFocusEffect } from '@react-navigation/native';
-import {View,Text,StyleSheet, TouchableOpacity} from 'react-native';
-import { useAuthStore } from '../store/useAuthStore';
-import axios from '../services/api';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useCallback, useEffect } from "react";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ImageBackground,
+  ScrollView,
+  SafeAreaView,
+  Dimensions,
+  Platform,
+  StatusBar,
+} from "react-native";
+import { useFocusEffect, useNavigation } from "@react-navigation/native";
+import { useAuthStore } from "../store/useAuthStore";
+import axios from "../services/api";
+import { globalStyles } from "../styles/globalStyles";
+
+const { width } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const { user, token } = useAuthStore();
@@ -14,15 +26,19 @@ export default function HomeScreen() {
 
   const fetchBancos = async () => {
     try {
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      const response = await axios.get('/contas');
+      axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      const response = await axios.get("/contas");
       const contas = Array.isArray(response.data)
         ? response.data
         : response.data.contas || [];
       setBancos(contas);
       calcularSaldoTotal(contas);
     } catch (error) {
-      console.error('Erro ao buscar bancos:', error.message, error.response?.data);
+      console.error(
+        "Erro ao buscar bancos:",
+        error.message,
+        error.response?.data
+      );
     }
   };
 
@@ -38,129 +54,114 @@ export default function HomeScreen() {
 
   const calcularSaldoTotal = (lista) => {
     if (!Array.isArray(lista)) return;
-    const total = lista.reduce((acc, banco) => acc + parseFloat(banco.saldo_inicial), 0);
+    const total = lista.reduce(
+      (acc, banco) => acc + parseFloat(banco.saldo_inicial),
+      0
+    );
     setSaldoTotal(total);
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.welcome}>Bem vindo de volta, {user?.name} 😉</Text>
+    <ImageBackground
+      source={require("../assets/images/image.png")}
+      style={globalStyles.background}
+      resizeMode="cover"
+    >
+      <SafeAreaView style={globalStyles.safeArea}>
+        <ScrollView contentContainerStyle={globalStyles.scrollContainer}>
+          <Text style={styles.welcome}>Bem-vindo de volta {user?.name}😉</Text>
 
-      {/* Card de Saldo */}
-      <View style={styles.card}>
-        <Text style={styles.title}>Seu saldo</Text>
-        <Text style={styles.balance}>R$ {saldoTotal.toFixed(2)}</Text>
+          <View style={globalStyles.card}>
+            <Text style={styles.title}>Seu saldo</Text>
+            <Text style={styles.balance}>R$ {saldoTotal.toFixed(2)}</Text>
 
-        {bancos.map((banco) => (
-          <View key={banco.id} style={styles.bankItem}>
-            <Text style={styles.bankText}>{banco.banco}</Text>
-            <Text style={styles.bankText}>
-              R$ {parseFloat(banco.saldo_inicial).toFixed(2)}
-            </Text>
+            {bancos.map((banco) => (
+              <View key={banco.id} style={styles.bankItem}>
+                <Text style={styles.bankText}>{banco.banco}</Text>
+                <Text style={styles.bankText}>
+                  R$ {parseFloat(banco.saldo_inicial).toFixed(2)}
+                </Text>
+              </View>
+            ))}
           </View>
-        ))}
-      </View>
 
-      {/* Card Banco (navegação) */}
-      <TouchableOpacity
-        style={[styles.card, styles.cardBanco]}
-        onPress={() => navigation.navigate('Bancos')}
-      >
-        <Text style={styles.title}>Banco</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[globalStyles.card, styles.cardBanco]}
+            onPress={() => navigation.navigate("Bancos")}
+          >
+            <Text style={styles.title}>Banco</Text>
+          </TouchableOpacity>
 
-      {/* Card Extrato (navegação) */}
-      <TouchableOpacity style={[styles.card, styles.cardBanco]} onPress={() => navigation.navigate('Extrato')}>
-        <Text style={styles.title}>Extrato</Text>
-      </TouchableOpacity>
+          <TouchableOpacity
+            style={[globalStyles.card, styles.cardBanco]}
+            onPress={() => navigation.navigate("Extrato")}
+          >
+            <Text style={styles.title}>Extrato</Text>
+          </TouchableOpacity>
 
-      {/* Botões + / - */}
-      <View style={styles.buttonRow}>
-        <TouchableOpacity
-          style={styles.redButton}
-          onPress={() => navigation.navigate('AdicionarSaida')}
-        >
-          <Text style={styles.buttonText}>-</Text>
-        </TouchableOpacity>
+          <View style={styles.buttonRow}>
+            <TouchableOpacity
+              style={[
+                globalStyles.circleButton,
+                globalStyles.circleButtonRemove,
+              ]}
+              onPress={() => navigation.navigate("AdicionarSaida")}
+            >
+              <Text style={globalStyles.buttonSymbol}>-</Text>
+            </TouchableOpacity>
 
-        <TouchableOpacity
-          style={styles.greenButton}
-          onPress={() => navigation.navigate('AdicionarEntrada')}
-        >
-          <Text style={styles.buttonText}>+</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+            <TouchableOpacity
+              style={[globalStyles.circleButton, globalStyles.circleButtonAdd]}
+              onPress={() => navigation.navigate("AdicionarEntrada")}
+            >
+              <Text style={globalStyles.buttonSymbol}>+</Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
+    </ImageBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#11111A',
-    padding: 20,
-  },
   welcome: {
-    color: '#00BFFF',
-    fontSize: 20,
-    marginBottom: 10,
-  },
-  card: {
-    backgroundColor: '#2E2E3A',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 20,
-  },
-  cardBanco: {
-    // opcional: ajuste de estilo específico para o card Banco
-    justifyContent: 'center',
-    alignItems: 'center',
+    color: "#FFF",
+    fontSize: 22,
+    marginBottom: 15,
+    fontWeight: "600",
   },
   title: {
     fontSize: 18,
-    color: '#FFF',
-    marginBottom: 5,
+    color: "#FFF",
+    marginBottom: 8,
+    fontWeight: "500",
   },
   balance: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#FFF',
+    fontSize: 26,
+    fontWeight: "bold",
+    color: "#FFF",
     marginBottom: 10,
   },
   bankItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: "row",
+    justifyContent: "space-between",
     borderTopWidth: 1,
-    borderTopColor: '#444',
+    borderTopColor: "rgba(255, 255, 255, 0.52)",
     paddingVertical: 8,
   },
   bankText: {
-    color: '#FFF',
+    color: "#FFF",
+    fontSize: 16,
+  },
+  cardBanco: {
+    alignItems: "center",
+    justifyContent: "center",
   },
   buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 20,
-  },
-  redButton: {
-    backgroundColor: '#D9534F',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  greenButton: {
-    backgroundColor: '#5CB85C',
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  buttonText: {
-    fontSize: 24,
-    color: '#FFF',
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    flexWrap: "wrap",
+    marginTop: 30,
   },
 });
-
