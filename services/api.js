@@ -1,9 +1,9 @@
 // services/api.js
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-
+import { API_URL } from "./config.var";
 const api = axios.create({
-  baseURL: "http://172.20.10.2:8000/api",
+  baseURL: API_URL,
 });
 
 // Interceptor para adicionar o Bearer token
